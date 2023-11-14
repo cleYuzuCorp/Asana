@@ -1,0 +1,12 @@
+{
+  "type": "crm-card",
+  "data": {
+    "title": "Asana",
+    "uid": "asana",
+    "location": "crm.record.tab",
+    "module": {
+      "file": "asana.tsx"
+    },
+    "objectTypes": [{ "name": "deals" }]
+  }
+}

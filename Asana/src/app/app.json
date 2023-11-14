@@ -1,0 +1,16 @@
+{
+  "name": "YuzuCorp",
+  "description": "C'est une carte de création d'un projet Asana",
+  "uid": "asana",
+  "scopes": ["crm.objects.contacts.read", "crm.objects.contacts.write"],
+  "public": false,
+  "extensions": {
+    "crm": {
+      "cards": [
+        {
+          "file": "extensions/asana-card.json"
+        }
+      ]
+    }
+  }
+}
