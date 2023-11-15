@@ -2,24 +2,52 @@ const axios = require('axios')
 
 exports.main = (context = {}, sendResponse) => {
   const { dealStage } = context.parameters
-  const token = "pat-na1-b4475a9a-541a-461a-bed0-ab46bb9b6812"
-  return updateProps(token, dealStage)
-    .then(() => {
-      sendResponse({ status: 'success' })
+
+  return getUsers(dealStage)
+    .then((data) => {
+      sendResponse({ status: 'success', data:data.data })
     })
     .catch((e) => {
       sendResponse({ status: 'error', message: e.message })
     })
 }
 
-const updateProps = (token, dealStage) => {
-  return axios.get(
-    `https://app.asana.com/api/1.0/users`,
+const getUsers = (dealStage) => {
+  return refreshAccessToken()
+    .then((newToken) => {
+      return axios.get(
+        'https://app.asana.com/api/1.0/users',
+        {
+          headers: {
+            Authorization: `Bearer ${newToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+    })
+}
+
+const refreshAccessToken = () => {
+  const refreshToken = "2/1204730887006934/1205951601419302:193f502db8325134524f9c6972d30e10"
+  const clientId = "1205951601419302"
+  const clientSecret = "4e4435b7d23f8fc6151f98e09fe4a20d"
+  const codeVerifier = "fdsuiafhjbkewbfnmdxzvbuicxlhkvnemwavx"
+
+  return axios.post(
+    'https://app.asana.com/-/oauth_token',
+    `grant_type=refresh_token&refresh_token=${refreshToken}&code_verifier=${codeVerifier}`,
     {
       headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
       },
     },
   )
+    .then((response) => {
+      if (response.data && response.data.access_token) {
+        return response.data.access_token
+      } else {
+        throw new Error("Unable to refresh access token.")
+      }
+    })
 }

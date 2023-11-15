@@ -5,6 +5,10 @@
     "getUsers": {
       "file": "getUsers.js",
       "secrets": []
+    },
+    "createProject": {
+      "file": "createProject.js",
+      "secrets": []
     }
   }
 }
