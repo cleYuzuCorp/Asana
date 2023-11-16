@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import {
+  Accordion,
   Alert,
   Button,
   Flex,
@@ -27,15 +28,32 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
   const [idAsana, setIdAsana] = useState()
   const [dealName, setDealName] = useState('')
 
+  const [open, setOpen] = useState(false)
+
   const [projectType, setProjectType] = useState<string | undefined>('Sales Ops Récurrent')
   const [name, setName] = useState('')
   const [admin, setAdmin] = useState<string | number | undefined>()
   const [associate, setAssociate] = useState<Array<string | number>>([])
-  const [description, setDescription] = useState('')
-  const [associatedContact, setAssociateContact] = useState<string | number | undefined>()
 
+  const [origin, setOrigin] = useState('')
+  const [issue, setIssue] = useState('')
+  const [need, setNeed] = useState('')
+  const [instruction, setInstruction] = useState('')
+  const [decisionMakers, setDecisionMakers] = useState('')
+  const [propaleLink, setPropaleLink] = useState('')
+  const [subcontracting, setSubcontracting] = useState('')
+  const [daySoldCount, setDaySoldCount] = useState('')
+  const [endDateProject, setEndDateProject] = useState('')
+  const [otherProject, setOtherProject] = useState('')
+
+  const [workspaces, setWorkspaces] = useState([{ gid: '', name: '', resource_type: '' }])
+  const [teams, setTeams] = useState([])
+  const [team, setTeam] = useState<string | number | undefined>()
+  const [optionsTeams, setOptionsTeams] = useState<{ label: string; value: string; }[]>([])
   const [users, setUsers] = useState([])
   const [optionsUsers, setOptionsUsers] = useState<{ label: string; value: string; }[]>([])
+
+  const [project, setProject] = useState({ gid: '', name: '', resource_type: '' })
 
   const [error, setError] = useState('')
 
@@ -62,7 +80,37 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
         setError(resp.message || 'An error occurred')
       }
     })
+
+    runServerless({
+      name: 'getWorkspaces',
+      parameters: {
+        dealStage: dealStage
+      },
+    }).then((resp: { status: string; response: { data: { data: any }; }; message: any; }) => {
+      if (resp.status === 'SUCCESS') {
+        setWorkspaces(resp.response.data.data)
+      } else {
+        setError(resp.message || 'An error occurred')
+      }
+    })
   }, [fetchCrmObjectProperties])
+
+  useEffect(() => {
+    if (workspaces[0].gid !== '') {
+      runServerless({
+        name: 'getTeams',
+        parameters: {
+          workspace: workspaces[0].gid
+        },
+      }).then((resp: { status: string; response: { data: { data: any }; }; message: any; }) => {
+        if (resp.status === 'SUCCESS') {
+          setTeams(resp.response.data.data)
+        } else {
+          setError(resp.message || 'An error occurred')
+        }
+      })
+    }
+  }, [workspaces])
 
   useEffect(() => {
     setName(dealName + ' - ' + projectType)
@@ -79,6 +127,34 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
     }
   }, [users])
 
+  useEffect(() => {
+    if (teams) {
+      const optionsTemp = teams.map((team: { name: string; gid: string; }) => ({
+        label: team.name,
+        value: team.gid
+      }))
+
+      setOptionsTeams(optionsTemp)
+    }
+  }, [teams])
+
+  useEffect(() => {
+    if (project.gid !== '') {
+      runServerless({
+        name: 'createTask',
+        parameters: {
+          project: project.gid,
+        },
+      }).then((resp: { status: string; response: { data: { data: any }; }; message: any; }) => {
+        if (resp.status === 'SUCCESS') {
+          console.log(resp)
+        } else {
+          setError(resp.message || 'An error occurred')
+        }
+      })
+    }
+  }, [project])
+
   const handleSubmit = () => {
     runServerless({
       name: 'createProject',
@@ -86,11 +162,16 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
         name: name,
         admin: admin,
         associate: associate,
-        description: description
-      },
+        team: team
+      }
     }).then((resp: { status: string; response: { data: { data: any }; }; message: any; }) => {
       if (resp.status === 'SUCCESS') {
-        console.log(resp)
+        addAlert({
+          type: 'success',
+          message: 'Projet créer avec succès !',
+        })
+
+        setProject(resp.response.data.data)
       } else {
         setError(resp.message || 'An error occurred')
       }
@@ -105,68 +186,153 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
     <>
       {dealStage === "closedwon" && idAsana === null ?
         <Flex direction="column" gap="lg">
-          <Flex justify="around">
-            <Input
-              name="deal_name"
-              label="Nom de la transaction"
-              value={dealName}
-              onChange={(newDealName) => setDealName(newDealName)}
-            />
+          <Accordion title="Création du projet Asana" open={open ? false : true} onClick={() => setOpen(open ? false : true)}>
+            <Flex direction="column" gap="md">
+              <Flex justify="around">
+                <Input
+                  name="deal_name"
+                  label="Nom de la transaction"
+                  value={dealName}
+                  onChange={(newDealName) => setDealName(newDealName)}
+                />
 
-            <ToggleGroup
-              name="project_type"
-              label="Type de projet"
-              toggleType="radioButtonList"
-              inline={true}
-              options={optionsProjectType}
-              value={projectType}
-              onChange={(newProjectType) => setProjectType(newProjectType)}
-            />
-          </Flex>
+                <ToggleGroup
+                  name="project_type"
+                  label="Type de projet"
+                  toggleType="radioButtonList"
+                  inline={true}
+                  options={optionsProjectType}
+                  value={projectType}
+                  onChange={(newProjectType) => setProjectType(newProjectType)}
+                />
+              </Flex>
 
-          <Input
-            name="name"
-            label="Nom du projet"
-            value={name}
-            onChange={(newName) => setName(newName)}
-          />
+              <Input
+                name="name"
+                label="Nom du projet"
+                required={true}
+                value={name}
+                onChange={(newName) => setName(newName)}
+              />
 
-          <Flex justify="around">
-            <Select
-              name="admin"
-              label="Admin du projet"
-              options={optionsUsers}
-              value={admin}
-              onChange={(newAdmin) => setAdmin(newAdmin)}
-            />
+              <Flex justify="around">
+                <Select
+                  name="admin"
+                  label="Admin du projet"
+                  required={true}
+                  options={optionsUsers}
+                  value={admin}
+                  onChange={(newAdmin) => setAdmin(newAdmin)}
+                />
 
-            <MultiSelect
-              name="associes"
-              label="Associés au projet"
-              options={optionsUsers}
-              value={associate}
-              onChange={(newAssociate) => setAssociate(newAssociate)}
-            />
-          </Flex>
+                <MultiSelect
+                  name="associes"
+                  label="Associés au projet"
+                  required={true}
+                  options={optionsUsers}
+                  value={associate}
+                  onChange={(newAssociate) => setAssociate(newAssociate)}
+                />
+              </Flex>
 
-          <TextArea
-            name="description"
-            label="Description"
-            value={description}
-            onChange={(newDescription) => setDescription(newDescription)}
-          />
+              <Select
+                name="teams"
+                label="Équipe"
+                required={true}
+                options={optionsTeams}
+                value={team}
+                onChange={(newTeam) => setTeam(newTeam)}
+              />
 
-          <Select
-            name="contacts_associes"
-            label="Contacts associés à la transaction"
-            options={optionsUsers}
-            value={associatedContact}
-            onChange={(newAssociatedContact) => setAssociateContact(newAssociatedContact)}
-          />
+              <Button variant="primary" disabled={name && admin && associate && team ? false : true} onClick={() => setOpen(true)}>
+                Renseigner les informations du projet
+              </Button>
+            </Flex>
+          </Accordion>
 
-          <Button variant="primary" onClick={handleSubmit}>
-            Créer le projet
-          </Button>
+          <Accordion title="Informations du projet" open={open ? true : false} onClick={() => setOpen(open ? false : true)}>
+            <Flex direction="column" gap="md">
+              <TextArea
+                name="origin"
+                label="Origines et informations non formelles"
+                value={origin}
+                onChange={(newOrigin) => setOrigin(newOrigin)}
+                tooltip="Décrire ici d'où vient la demande cliente, comment elle à été obtenu et toutes les infos ou ressentis obtenus. L'objectif est d'aider le chef de projet à avoir un contexte avant que ce projet arrive."
+              />
+
+              <TextArea
+                name="issue"
+                label="Enjeux"
+                value={issue}
+                onChange={(newIssue) => setIssue(newIssue)}
+                tooltip="Décrire ici à quoi le projet répond en terme de besoin/douleur/amélioration pour le client. Il s'agit de bien décrire aussi les attentes du client en terme de macro."
+              />
+
+              <TextArea
+                name="need"
+                label="Besoin"
+                value={need}
+                onChange={(newNeed) => setNeed(newNeed)}
+                tooltip="Décrire les grandes phrases dans votre proposition commerciale (ateliers, phase, étape). Il s'agit ici de décrire comment vous imaginez le déroulé de sa prestation. Il est important de donner des informations qui ne sont pas dans la proposition en pointant des informations importantes transmises uniquement au client"
+              />
+
+              <TextArea
+                name="instruction"
+                label="Consigne"
+                value={instruction}
+                onChange={(newInstruction) => setInstruction(newInstruction)}
+                tooltip="Décrire ici toute information concernant la flexibilité sur le planning, le délai, les livrables, les ateliers, les points de vigilance projet."
+              />
+
+              <TextArea
+                name="desicion_maker"
+                label="Décideurs"
+                value={decisionMakers}
+                onChange={(newDecisionMakers) => setDecisionMakers(newDecisionMakers)}
+                tooltip="Décrire ici le rôle de chaque interlocuteur et personne que vous avez identifier à date dans le cadre du projet. Préciser leur lien hiérarchique et leur influence sur le projet. Il peut y avoir des partenaires aussi présent."
+              />
+
+              <TextArea
+                name="propale_link"
+                label="Lien propale"
+                value={propaleLink}
+                onChange={(newPropaleLink) => setPropaleLink(newPropaleLink)}
+              />
+
+              <TextArea
+                name="subcontracting"
+                label="Sous traitance"
+                value={subcontracting}
+                onChange={(newSubcontracting) => setSubcontracting(newSubcontracting)}
+                tooltip="Indiquer si sous traitance"
+              />
+
+              <TextArea
+                name="day_sold_count"
+                label="Nombre de jours vendus"
+                value={daySoldCount}
+                onChange={(newDaySoldCount) => setDaySoldCount(newDaySoldCount)}
+              />
+
+              <TextArea
+                name="end_date"
+                label="Date de fin du projet souhaité"
+                value={endDateProject}
+                onChange={(newEndDateProject) => setEndDateProject(newEndDateProject)}
+              />
+
+              <TextArea
+                name="other_project"
+                label="Autre projets lié/dépendant au projet"
+                value={otherProject}
+                onChange={(newOtherProject) => setOtherProject(newOtherProject)}
+              />
+
+              <Button variant="primary" disabled={name && admin && associate && team ? false : true} onClick={handleSubmit}>
+                Créer le projet
+              </Button>
+            </Flex>
+          </Accordion>
         </Flex> : <Text>
           Le deal n'est pas encore gagné
         </Text>

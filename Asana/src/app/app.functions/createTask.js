@@ -1,9 +1,9 @@
 const axios = require('axios')
 
 exports.main = (context = {}, sendResponse) => {
-    const { name, admin, associate, team } = context.parameters
+    const { project } = context.parameters
 
-    return createProject(name, admin, associate, team)
+    return createTask(project)
         .then((data) => {
             sendResponse({ status: 'success', data: data.data },)
         })
@@ -12,17 +12,15 @@ exports.main = (context = {}, sendResponse) => {
         })
 }
 
-const createProject = (name, admin, associate, team) => {
+const createTask = (project) => {
     return refreshAccessToken()
         .then((newToken) => {
             return axios.post(
-                'https://app.asana.com/api/1.0/projects',
+                'https://app.asana.com/api/1.0/tasks',
                 {
-                    data: {
-                        name: name,
-                        owner: admin,
-                        followers: associate,
-                        team: team
+                    data : {
+                        name: 'Passation',
+                        projects: [project],
                     }
                 },
                 {

@@ -6,8 +6,20 @@
       "file": "getUsers.js",
       "secrets": []
     },
+    "getWorkspaces": {
+      "file": "getWorkspaces.js",
+      "secrets": []
+    },
+    "getTeams": {
+      "file": "getTeams.js",
+      "secrets": []
+    },
     "createProject": {
       "file": "createProject.js",
+      "secrets": []
+    },
+    "createTask": {
+      "file": "createTask.js",
       "secrets": []
     }
   }

@@ -1,34 +1,26 @@
 const axios = require('axios')
 
 exports.main = (context = {}, sendResponse) => {
-    const { name, admin, associate, team } = context.parameters
+    const { workspace } = context.parameters
 
-    return createProject(name, admin, associate, team)
+    return getTeams(workspace)
         .then((data) => {
-            sendResponse({ status: 'success', data: data.data },)
+            sendResponse({ status: 'success', data: data.data })
         })
         .catch((e) => {
             sendResponse({ status: 'error', message: e.message })
         })
 }
 
-const createProject = (name, admin, associate, team) => {
+const getTeams = (workspace) => {
     return refreshAccessToken()
         .then((newToken) => {
-            return axios.post(
-                'https://app.asana.com/api/1.0/projects',
-                {
-                    data: {
-                        name: name,
-                        owner: admin,
-                        followers: associate,
-                        team: team
-                    }
-                },
+            return axios.get(
+                `https://app.asana.com/api/1.0/workspaces/${workspace}/teams`,
                 {
                     headers: {
                         Authorization: `Bearer ${newToken}`,
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     }
                 }
             )
@@ -47,7 +39,7 @@ const refreshAccessToken = () => {
         {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+                Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
             }
         }
     )

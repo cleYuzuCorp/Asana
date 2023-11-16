@@ -3,7 +3,7 @@ const axios = require('axios')
 exports.main = (context = {}, sendResponse) => {
   const { dealStage } = context.parameters
 
-  return getUsers(dealStage)
+  return getWorkspaces(dealStage)
     .then((data) => {
       sendResponse({ status: 'success', data: data.data })
     })
@@ -12,11 +12,11 @@ exports.main = (context = {}, sendResponse) => {
     })
 }
 
-const getUsers = (dealStage) => {
+const getWorkspaces = (dealStage) => {
   return refreshAccessToken()
     .then((newToken) => {
       return axios.get(
-        'https://app.asana.com/api/1.0/users',
+        'https://app.asana.com/api/1.0/workspaces',
         {
           headers: {
             Authorization: `Bearer ${newToken}`,
