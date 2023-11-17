@@ -4,10 +4,10 @@ import {
   Alert,
   Button,
   Flex,
+  Heading,
   Input,
   MultiSelect,
   Select,
-  Text,
   TextArea,
   ToggleGroup,
   hubspot,
@@ -20,10 +20,11 @@ hubspot.extend<'crm.record.tab'>(({ context, runServerlessFunction, actions }) =
     addAlert={actions.addAlert}
     fetchCrmObjectProperties={actions.fetchCrmObjectProperties}
   />
-));
+))
 
 const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: { context: any, runServerless: any, addAlert: any, fetchCrmObjectProperties: any }) => {
 
+  const [dealId, setDealId] = useState()
   const [dealStage, setDealStage] = useState()
   const [idAsana, setIdAsana] = useState()
   const [dealName, setDealName] = useState('')
@@ -54,6 +55,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
   const [optionsUsers, setOptionsUsers] = useState<{ label: string; value: string; }[]>([])
 
   const [project, setProject] = useState({ gid: '', name: '', resource_type: '' })
+  const [time, setTime] = useState('')
 
   const [error, setError] = useState('')
 
@@ -63,10 +65,14 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
   ]
 
   useEffect(() => {
-    fetchCrmObjectProperties(['dealstage', 'idasana', 'dealname']).then((properties: { [propertyName: string]: any }) => {
+    fetchCrmObjectProperties(['hs_object_id', 'dealstage', 'idasana', 'dealname', 'commentaire___enjeu', 'commentaire___besoin', 'commentaire___decideurs']).then((properties: { [propertyName: string]: any }) => {
+      setDealId(properties.hs_object_id)
       setDealStage(properties.dealstage)
       setIdAsana(properties.idasana)
       setDealName(properties.dealname)
+      setIssue(properties.commentaire___enjeu)
+      setNeed(properties.commentaire___besoin)
+      setDecisionMakers(properties.commentaire___decideurs)
     })
     runServerless({
       name: 'getUsers',
@@ -94,6 +100,31 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
       }
     })
   }, [fetchCrmObjectProperties])
+
+  useEffect(() => {
+    if (idAsana) {
+      runServerless({
+        name: 'getProjectTime',
+        parameters: {
+          idAsana: idAsana,
+        },
+      }).then((resp: { status: string; response: { data: any; }; message: any; }) => {
+        if (resp.status === 'SUCCESS') {
+          const timesArray = resp.response.data.map((item: any) => item.time)
+          const totalSeconds = timesArray.reduce((total: any, seconds: any) => total + seconds, 0)
+
+          const hours = Math.floor(totalSeconds / 3600)
+          const minutes = Math.floor((totalSeconds % 3600) / 60)
+          const remainingSeconds = totalSeconds % 60
+
+          const formattedTime = `${hours}h ${minutes}m ${remainingSeconds}s`
+          setTime(formattedTime)
+        } else {
+          setError(resp.message || 'An error occurred')
+        }
+      })
+    }
+  }, [idAsana])
 
   useEffect(() => {
     if (workspaces[0].gid !== '') {
@@ -144,10 +175,34 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
         name: 'createTask',
         parameters: {
           project: project.gid,
+          origin: origin,
+          issue: issue,
+          need: need,
+          instruction: instruction,
+          decisionMakers: decisionMakers,
+          propaleLink: propaleLink,
+          subcontracting: subcontracting,
+          daySoldCount: daySoldCount,
+          endDateProject: endDateProject,
+          otherProject: otherProject
         },
       }).then((resp: { status: string; response: { data: { data: any }; }; message: any; }) => {
         if (resp.status === 'SUCCESS') {
           console.log(resp)
+        } else {
+          setError(resp.message || 'An error occurred')
+        }
+      })
+
+      runServerless({
+        name: 'updateIdAsana',
+        parameters: {
+          dealId: dealId,
+          value: project.gid
+        },
+      }).then((resp: { status: string; response: { data: { data: any }; }; message: any; }) => {
+        if (resp.status === 'SUCCESS') {
+          setIdAsana(resp.response.data.data.gid)
         } else {
           setError(resp.message || 'An error occurred')
         }
@@ -184,7 +239,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
 
   return (
     <>
-      {dealStage === "closedwon" && idAsana === null ?
+      {dealStage === "closedwon" && !idAsana ?
         <Flex direction="column" gap="lg">
           <Accordion title="Création du projet Asana" open={open ? false : true} onClick={() => setOpen(open ? false : true)}>
             <Flex direction="column" gap="md">
@@ -323,7 +378,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
 
               <TextArea
                 name="other_project"
-                label="Autre projets lié/dépendant au projet"
+                label="Autres projets lié/dépendant au projet"
                 value={otherProject}
                 onChange={(newOtherProject) => setOtherProject(newOtherProject)}
               />
@@ -333,9 +388,11 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
               </Button>
             </Flex>
           </Accordion>
-        </Flex> : <Text>
+        </Flex> : dealStage === "closedwon" && idAsana ? <Flex>
+          <Heading>Temps passé sur le projet : {time}</Heading>
+        </Flex> : <Heading>
           Le deal n'est pas encore gagné
-        </Text>
+        </Heading>
       }
     </>
   )

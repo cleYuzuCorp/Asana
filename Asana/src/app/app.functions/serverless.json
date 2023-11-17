@@ -21,6 +21,14 @@
     "createTask": {
       "file": "createTask.js",
       "secrets": []
+    },
+    "updateIdAsana": {
+      "file": "updateIdAsana.js",
+      "secrets": []
+    },
+    "getProjectTime": {
+      "file": "getProjectTime.js",
+      "secrets": []
     }
   }
 }

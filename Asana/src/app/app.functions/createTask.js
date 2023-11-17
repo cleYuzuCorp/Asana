@@ -1,9 +1,9 @@
 const axios = require('axios')
 
 exports.main = (context = {}, sendResponse) => {
-    const { project } = context.parameters
+    const { project, origin, issue, need, instruction, decisionMakers, propaleLink, subcontracting, daySoldCount, endDateProject, otherProject } = context.parameters
 
-    return createTask(project)
+    return createTask(project, origin, issue, need, instruction, decisionMakers, propaleLink, subcontracting, daySoldCount, endDateProject, otherProject)
         .then((data) => {
             sendResponse({ status: 'success', data: data.data },)
         })
@@ -12,15 +12,38 @@ exports.main = (context = {}, sendResponse) => {
         })
 }
 
-const createTask = (project) => {
+const createTask = (project, origin, issue, need, instruction, decisionMakers, propaleLink, subcontracting, daySoldCount, endDateProject, otherProject) => {
     return refreshAccessToken()
         .then((newToken) => {
+            const taskDescription = `
+Origine: ${origin}
+ 
+Enjeu: ${issue}
+
+Besoin: ${need}
+
+Consigne: ${instruction}
+
+Décideurs: ${decisionMakers}
+
+Lien propale: ${propaleLink}
+
+Sous traitance: ${subcontracting}
+
+Nombre de jours vendus: ${daySoldCount}
+
+Date de fin de projet souhaité: ${endDateProject}
+
+Autres projets lié/dépendant au projet: ${otherProject}
+            `.trim()
+
             return axios.post(
                 'https://app.asana.com/api/1.0/tasks',
                 {
-                    data : {
+                    data: {
                         name: 'Passation',
                         projects: [project],
+                        notes: taskDescription
                     }
                 },
                 {
