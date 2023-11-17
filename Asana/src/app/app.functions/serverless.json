@@ -1,0 +1,34 @@
+{
+  "runtime": "nodejs16.x",
+  "version": "1.0",
+  "appFunctions": {
+    "getUsers": {
+      "file": "getUsers.js",
+      "secrets": []
+    },
+    "getWorkspaces": {
+      "file": "getWorkspaces.js",
+      "secrets": []
+    },
+    "getTeams": {
+      "file": "getTeams.js",
+      "secrets": []
+    },
+    "createProject": {
+      "file": "createProject.js",
+      "secrets": []
+    },
+    "createTask": {
+      "file": "createTask.js",
+      "secrets": []
+    },
+    "updateIdAsana": {
+      "file": "updateIdAsana.js",
+      "secrets": []
+    },
+    "getProjectTime": {
+      "file": "getProjectTime.js",
+      "secrets": []
+    }
+  }
+}
