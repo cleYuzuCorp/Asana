@@ -248,7 +248,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
                   name="deal_name"
                   label="Nom de la transaction"
                   value={dealName}
-                  onChange={(newDealName) => setDealName(newDealName)}
+                  onChange={(newDealName: any) => setDealName(newDealName)}
                 />
 
                 <ToggleGroup
@@ -258,7 +258,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
                   inline={true}
                   options={optionsProjectType}
                   value={projectType}
-                  onChange={(newProjectType) => setProjectType(newProjectType)}
+                  onChange={(newProjectType: any) => setProjectType(newProjectType)}
                 />
               </Flex>
 
@@ -267,7 +267,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
                 label="Nom du projet"
                 required={true}
                 value={name}
-                onChange={(newName) => setName(newName)}
+                onChange={(newName: any) => setName(newName)}
               />
 
               <Flex justify="around">
@@ -277,7 +277,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
                   required={true}
                   options={optionsUsers}
                   value={admin}
-                  onChange={(newAdmin) => setAdmin(newAdmin)}
+                  onChange={(newAdmin: any) => setAdmin(newAdmin)}
                 />
 
                 <MultiSelect
@@ -286,7 +286,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
                   required={true}
                   options={optionsUsers}
                   value={associate}
-                  onChange={(newAssociate) => setAssociate(newAssociate)}
+                  onChange={(newAssociate: any) => setAssociate(newAssociate)}
                 />
               </Flex>
 
@@ -296,7 +296,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
                 required={true}
                 options={optionsTeams}
                 value={team}
-                onChange={(newTeam) => setTeam(newTeam)}
+                onChange={(newTeam: any) => setTeam(newTeam)}
               />
 
               <Button variant="primary" disabled={name && admin && associate && team ? false : true} onClick={() => setOpen(true)}>
