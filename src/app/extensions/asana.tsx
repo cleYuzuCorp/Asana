@@ -31,7 +31,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
 
   const [open, setOpen] = useState(false)
 
-  const [projectType, setProjectType] = useState<string | undefined>('Sales Ops Récurrent')
+  const [projectType, setProjectType] = useState<string | undefined>()
   const [name, setName] = useState('')
   const [admin, setAdmin] = useState<string | number | undefined>()
   const [associate, setAssociate] = useState<Array<string | number>>([])
@@ -243,6 +243,14 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
         <Flex direction="column" gap="lg">
           <Accordion title="Création du projet Asana" open={open ? false : true} onClick={() => setOpen(open ? false : true)}>
             <Flex direction="column" gap="md">
+              <Input
+                name="name"
+                label="Nom du projet"
+                required={true}
+                value={name}
+                onChange={(newName: any) => setName(newName)}
+              />
+
               <Flex justify="around">
                 <Input
                   name="deal_name"
@@ -262,18 +270,10 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
                 />
               </Flex>
 
-              <Input
-                name="name"
-                label="Nom du projet"
-                required={true}
-                value={name}
-                onChange={(newName: any) => setName(newName)}
-              />
-
               <Flex justify="around">
                 <Select
                   name="admin"
-                  label="Admin du projet"
+                  label="Chef de projet"
                   required={true}
                   options={optionsUsers}
                   value={admin}
