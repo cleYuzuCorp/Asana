@@ -2,7 +2,7 @@ const axios = require('axios')
 
 exports.main = (context = {}, sendResponse) => {
     const { dealId, value } = context.parameters
-    const token = "pat-na1-61a34a29-c617-4b56-b4dd-2d5a683b5a3e"
+    const token = "pat-na1-410db506-cb67-4366-9aee-c6571b593416"
     return updateIdAsana(token, dealId, value)
         .then((data) => {
             sendResponse({ status: 'success', data: data.data },)
