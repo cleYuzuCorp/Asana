@@ -31,7 +31,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
 
   const [open, setOpen] = useState(false)
 
-  const [projectType, setProjectType] = useState<string | undefined>()
+  const [projectType, setProjectType] = useState<string | undefined>('')
   const [name, setName] = useState('')
   const [admin, setAdmin] = useState<string | number | undefined>()
   const [associate, setAssociate] = useState<Array<string | number>>([])
@@ -144,7 +144,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
   }, [workspaces])
 
   useEffect(() => {
-    setName(dealName + ' - ' + projectType)
+    projectType === '' ? setName(dealName) : setName(dealName + ' - ' + projectType)
   }, [dealName, projectType])
 
   useEffect(() => {
