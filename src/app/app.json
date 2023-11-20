@@ -1,5 +1,5 @@
 {
-  "name": "YuzuCorp",
+  "name": "Yuzu Corp",
   "description": "C'est une carte de création d'un projet Asana",
   "uid": "asana",
   "scopes": ["crm.objects.deals.read", "crm.objects.deals.write"],
