@@ -239,7 +239,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
 
   return (
     <>
-      {dealStage === "closedwon" && !idAsana ?
+      {dealStage === "6502009" && !idAsana ?
         <Flex direction="column" gap="lg">
           <Accordion title="Création du projet Asana" open={open ? false : true} onClick={() => setOpen(open ? false : true)}>
             <Flex direction="column" gap="md">
@@ -388,7 +388,7 @@ const Asana = ({ context, runServerless, addAlert, fetchCrmObjectProperties }: {
               </Button>
             </Flex>
           </Accordion>
-        </Flex> : dealStage === "closedwon" && idAsana ? <Flex>
+        </Flex> : dealStage === "6502009" && idAsana ? <Flex>
           <Heading>Temps passé sur le projet : {time}</Heading>
         </Flex> : <Heading>
           Le deal n'est pas encore gagné
