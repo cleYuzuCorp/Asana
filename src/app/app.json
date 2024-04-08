@@ -1,8 +1,11 @@
 {
-  "name": "Yuzu Corp",
+  "name": "Yuzu Corp - ProjetHub (UI Extension)",
   "description": "C'est une carte de création d'un projet Asana",
   "uid": "asana",
-  "scopes": ["crm.objects.deals.read", "crm.objects.deals.write"],
+  "scopes": [
+    "crm.objects.deals.read",
+    "crm.objects.deals.write"
+  ],
   "public": false,
   "extensions": {
     "crm": {
