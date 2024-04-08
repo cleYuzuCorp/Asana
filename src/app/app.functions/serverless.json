@@ -1,34 +1,67 @@
 {
-  "runtime": "nodejs16.x",
-  "version": "1.0",
   "appFunctions": {
     "getUsers": {
       "file": "getUsers.js",
-      "secrets": []
+      "endpoint": {
+        "path": "getUsers.js",
+        "method": [
+          "GET"
+        ]
+      }
     },
     "getWorkspaces": {
       "file": "getWorkspaces.js",
-      "secrets": []
+      "endpoint": {
+        "path": "getWorkspaces.js",
+        "method": [
+          "GET"
+        ]
+      }
     },
     "getTeams": {
       "file": "getTeams.js",
-      "secrets": []
+      "endpoint": {
+        "path": "getTeams.js",
+        "method": [
+          "GET"
+        ]
+      }
     },
     "createProject": {
       "file": "createProject.js",
-      "secrets": []
+      "endpoint": {
+        "path": "createProject.js",
+        "method": [
+          "POST"
+        ]
+      }
     },
     "createTask": {
       "file": "createTask.js",
-      "secrets": []
+      "endpoint": {
+        "path": "createTask.js",
+        "method": [
+          "POST"
+        ]
+      }
     },
     "updateIdAsana": {
       "file": "updateIdAsana.js",
-      "secrets": []
+      "endpoint": {
+        "path": "updateIdAsana.js",
+        "method": [
+          "POST"
+        ]
+      }
     },
     "getProjectTime": {
       "file": "getProjectTime.js",
-      "secrets": []
+      "endpoint": {
+        "path": "getProjectTime.js",
+        "method": [
+          "GET"
+        ]
+      }
     }
   }
 }
